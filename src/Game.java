@@ -10,6 +10,9 @@ public class Game extends PApplet {
     public static int tanksDestroyed;
     public static int towerCount;
 
+    private static int xPos;
+    private static int lastTanksDestroyed;
+
     private static ArrayList<Entity> entities;
 
     private static int timer;
@@ -26,6 +29,8 @@ public class Game extends PApplet {
         tanksDestroyed = 0;
         entities = new ArrayList<>();
 
+        xPos = 800;
+        lastTanksDestroyed = 0;
         timer = 0;
     }
 
@@ -55,14 +60,18 @@ public class Game extends PApplet {
 
         timer--;
         if(timer <= 0) {
-            timer = 80;
+            timer = 50;
             Tank t = new Tank();
             entities.add(t);
         }
 
-        if(tanksDestroyed % 5 == 0) {
-            int xPos = 760;
-            int yPos = 260;
+        if(tanksDestroyed % 5 == 0 && tanksDestroyed > 0) {
+            if(tanksDestroyed == lastTanksDestroyed) {return;}
+            lastTanksDestroyed = tanksDestroyed;
+            if(towerCount%2 == 0) {
+                xPos -= 40;
+            }
+            int yPos = 260 + 240*(towerCount%2);
             Tower r = new Tower(xPos, yPos);
             entities.add(r);
             towerCount++;
