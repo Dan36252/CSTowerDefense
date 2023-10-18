@@ -5,7 +5,7 @@ public class Tower extends Entity{
     private static int TOWER_RADIUS = 40;
 
     public Tower(int x, int y) {
-        super(x, y, TOWER_SHOOT_SPEED, TOWER_RADIUS);
+        super("tower", x, y, TOWER_SHOOT_SPEED, TOWER_RADIUS);
     }
 
     public void drawTexture(PApplet pApplet) {

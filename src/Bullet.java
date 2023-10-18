@@ -7,7 +7,7 @@ public class Bullet extends Entity {
     private static int BULLET_RADIUS = 5;
     private int direction;
     public Bullet(int x, int y, int dir) {
-        super(x, y, BULLET_SPEED, BULLET_RADIUS);
+        super("bullet", x, y, BULLET_SPEED, BULLET_RADIUS);
         this.direction = dir;
     }
 

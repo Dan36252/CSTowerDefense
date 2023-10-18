@@ -1,10 +1,12 @@
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.core.PImage;
 
 import java.util.ArrayList;
 
 public class Game extends PApplet {
     // TODO: declare game variables
+    public static PImage tankTexture;
     public static int money;
     public static int lives;
     public static int tanksDestroyed;
@@ -24,6 +26,7 @@ public class Game extends PApplet {
 
     public void setup() {
         // TODO: initialize game variables
+        tankTexture = loadImage("assets/TankTexture.png");
         money = 0;
         lives = 5;
         tanksDestroyed = 0;
@@ -42,6 +45,8 @@ public class Game extends PApplet {
         background(255);    // paint screen white
         fill(0,255,0);          // load green paint color
         rect(0, 300, 800, 200);
+        PImage img = new PImage();
+
 
         textSize(13);
         fill(0);
@@ -54,7 +59,11 @@ public class Game extends PApplet {
         int index = 0;
         for (Entity e : entities) {
             index++;
-            e.drawTexture(this);
+            if(e.getType() == "tank") {
+                e.drawTexture(this, tankTexture);
+            } else {
+                e.drawTexture(this);
+            }
             e.act();
         }
 
