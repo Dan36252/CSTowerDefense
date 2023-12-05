@@ -17,9 +17,32 @@ public class Entity {
         this.radius = radius;
         this.isAlive = true;
     }
+
+
+
     public void drawTexture(PApplet pApplet){}
     public void drawTexture(PApplet pApplet, PImage texture){}
     public void act() {}
+
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
+    }
+
+    public double getSpeed(){
+        return speed;
+    }
+
+    public int getRadius(){
+        return radius;
+    }
+
+    public String getEntityType(){
+        return typeName;
+    }
 
     public void setAlive(boolean alive){this.isAlive = alive;}
     public String getType() {

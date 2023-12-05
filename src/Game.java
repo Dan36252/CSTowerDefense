@@ -2,6 +2,7 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
 
+import java.io.*;
 import java.util.ArrayList;
 
 public class Game extends PApplet {
@@ -15,7 +16,7 @@ public class Game extends PApplet {
     private static int xPos;
     private static int lastTanksDestroyed;
 
-    private static ArrayList<Entity> entities;
+    public static ArrayList<Entity> entities;
 
     private static int timer;
 
@@ -50,9 +51,9 @@ public class Game extends PApplet {
 
         textSize(13);
         fill(0);
-        text("Tanks Destroyed: "+tanksDestroyed, 20, 20);
-        text("Money: "+money, 20, 40);
-        text("Lives: "+lives, 20, 60);
+        text("Tanks Destroyed: " + tanksDestroyed, 20, 20);
+        text("Money: " + money, 20, 40);
+        text("Lives: " + lives, 20, 60);
 
         fill(0,255,0);
 
@@ -75,12 +76,14 @@ public class Game extends PApplet {
         }
 
         if(tanksDestroyed % 5 == 0 && tanksDestroyed > 0) {
-            if(tanksDestroyed == lastTanksDestroyed) {return;}
+            if(tanksDestroyed == lastTanksDestroyed) {
+                return;
+            }
             lastTanksDestroyed = tanksDestroyed;
-            if(towerCount%2 == 0) {
+            if(towerCount % 2 == 0) {
                 xPos -= 40;
             }
-            int yPos = 260 + 240*(towerCount%2);
+            int yPos = 260 + 240 * (towerCount % 2);
             Tower r = new Tower(xPos, yPos);
             entities.add(r);
             towerCount++;
@@ -88,6 +91,66 @@ public class Game extends PApplet {
 //        ellipse(mouseX, mouseY, 60, 60);  // draw circle at mouse loc
 //        ellipse(mouseX - 80, mouseY, 60, 60);  // draw circle at mouse loc
 //        ellipse(mouseX + 80, mouseY, 60, 60);  // draw circle at mouse loc
+    }
+
+    public void keyReleased(){
+        if (key == 's') {
+
+            System.out.println("s pressed");
+
+            // save all point data to a file
+            try {
+                PrintWriter out = new PrintWriter(new FileWriter("saveGame.txt"));
+
+
+                for (int i = 0; i < Game.entities.size(); i++) {
+                    Entity e = Game.entities.get(i);
+
+                    out.println(e.getEntityType() + ", " + e.getX() + ", " + e.getY()  + ", " + e.getSpeed() + ", " + e.getRadius());
+                }
+
+                out.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (key == 'r') {
+            System.out.println("r pressed");
+            Game.entities.clear();
+        }
+
+        if (key == 'l') {
+            try {
+                System.out.println("l pressed");
+
+                BufferedReader in = new BufferedReader(new FileReader("saveGame.txt"));
+                Game.entities.clear();
+
+                String line;
+                while ((line = in.readLine()) != null) {
+                    String[] vals = line.split (", ");
+                    String type = vals[0];
+                    int x = Integer.parseInt(vals[1]);
+                    int y = Integer.parseInt(vals[2]);
+                    double speed = Double.parseDouble(vals[3]);
+                    int radius = Integer.parseInt(vals[4]);
+
+                    Entity e = new Entity (type, x, y, speed, radius);
+                    Game.entities.add(e);
+                }
+
+                in.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+
+        }
+
     }
 
     public static void increaseTanksDestroyed(){
