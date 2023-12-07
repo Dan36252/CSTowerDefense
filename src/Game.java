@@ -37,12 +37,6 @@ public class Game extends PApplet {
         timer = 0;
     }
 
-    @Override
-    public void mouseClicked() {
-        System.out.println("Mouse Clicked: "+mouseX+", "+mouseY);
-
-    }
-
     /***
      * Draws each frame to the screen.  Runs automatically in a loop at frameRate frames a second.
      * tick each object (have it update itself), and draw each object
@@ -80,7 +74,6 @@ public class Game extends PApplet {
             entities.add(t);
         }
 
-        // Place towers automatically based on TanksDestroyed
         if(tanksDestroyed % 5 == 0 && tanksDestroyed > 0) {
             if(tanksDestroyed == lastTanksDestroyed) {return;}
             lastTanksDestroyed = tanksDestroyed;
@@ -104,5 +97,4 @@ public class Game extends PApplet {
     public static void main(String[] args) {
         PApplet.main("Game");
     }
-
 }
