@@ -17,8 +17,11 @@ public class Game extends PApplet {
     private static int lastTanksDestroyed;
 
     public static ArrayList<Entity> entities;
-
+    public static ArrayList<Entity> tempEntities;
     private static int timer;
+    private static boolean paused;
+    public static int index;
+
 
     public void settings() {
         size(800, 800);   // set the window size
@@ -32,10 +35,23 @@ public class Game extends PApplet {
         lives = 5;
         tanksDestroyed = 0;
         entities = new ArrayList<>();
-
+        tempEntities = new ArrayList<>();
         xPos = 800;
         lastTanksDestroyed = 0;
         timer = 0;
+        index = 0;
+        paused = true;
+    }
+
+    private void resetBoard(){
+        paused = true;
+        index = 0;
+        towerCount = 0;
+        tanksDestroyed = 0;
+        lastTanksDestroyed = 0;
+        xPos = 800;
+        timer = 0;
+        Game.entities.clear();
     }
 
     /***
@@ -57,7 +73,7 @@ public class Game extends PApplet {
 
         fill(0,255,0);
 
-        int index = 0;
+
         for (Entity e : entities) {
             index++;
             if(e.getType() == "tank") {
@@ -65,29 +81,32 @@ public class Game extends PApplet {
             } else {
                 e.drawTexture(this);
             }
-            e.act();
+
+            if (paused == false) {
+                e.act(entities);
+            }
         }
 
-        timer--;
-        if(timer <= 0) {
-            timer = 50;
-            Tank t = new Tank();
-            entities.add(t);
-        }
+            timer--;
+            if (timer <= 0) {
+                timer = 100;
+                Tank t = new Tank();
+                entities.add(t);
+            }
 
-        if(tanksDestroyed % 5 == 0 && tanksDestroyed > 0) {
-            if(tanksDestroyed == lastTanksDestroyed) {
-                return;
+            if (tanksDestroyed % 5 == 0 && tanksDestroyed > 0) {
+                if (tanksDestroyed == lastTanksDestroyed) {
+                    return;
+                }
+                lastTanksDestroyed = tanksDestroyed;
+                if (towerCount % 2 == 0) {
+                    xPos -= 40;
+                }
+                int yPos = 260 + 240 * (towerCount % 2);
+                Tower r = new Tower(xPos, yPos);
+                entities.add(r);
+                towerCount++;
             }
-            lastTanksDestroyed = tanksDestroyed;
-            if(towerCount % 2 == 0) {
-                xPos -= 40;
-            }
-            int yPos = 260 + 240 * (towerCount % 2);
-            Tower r = new Tower(xPos, yPos);
-            entities.add(r);
-            towerCount++;
-        }
 //        ellipse(mouseX, mouseY, 60, 60);  // draw circle at mouse loc
 //        ellipse(mouseX - 80, mouseY, 60, 60);  // draw circle at mouse loc
 //        ellipse(mouseX + 80, mouseY, 60, 60);  // draw circle at mouse loc
@@ -114,11 +133,22 @@ public class Game extends PApplet {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            resetBoard();
         }
 
         if (key == 'r') {
             System.out.println("r pressed");
-            Game.entities.clear();
+            resetBoard();
+        }
+
+        if (key == 'p') {
+            System.out.println("p pressed");
+            paused = !paused;
+
+//            xPos = 800;
+//            index = 0;
+//            lastTanksDestroyed = 0;
         }
 
         if (key == 'l') {
@@ -126,7 +156,7 @@ public class Game extends PApplet {
                 System.out.println("l pressed");
 
                 BufferedReader in = new BufferedReader(new FileReader("saveGame.txt"));
-                Game.entities.clear();
+                resetBoard();
 
                 String line;
                 while ((line = in.readLine()) != null) {
@@ -137,8 +167,17 @@ public class Game extends PApplet {
                     double speed = Double.parseDouble(vals[3]);
                     int radius = Integer.parseInt(vals[4]);
 
-                    Entity e = new Entity (type, x, y, speed, radius);
-                    Game.entities.add(e);
+                    Entity n = new Entity (type, x, y, speed, radius);
+
+
+                    Game.tempEntities.add(n);
+
+                    for (int i = 0; i < entities.size(); i++) {
+                        Game.tempEntities.add(Game.entities.get(i));
+                    }
+
+                    Game.entities = Game.tempEntities;
+                    Game.tempEntities.clear();
                 }
 
                 in.close();
@@ -152,6 +191,7 @@ public class Game extends PApplet {
         }
 
     }
+
 
     public static void increaseTanksDestroyed(){
         tanksDestroyed++;
