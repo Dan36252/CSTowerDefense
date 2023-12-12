@@ -1,3 +1,4 @@
+import com.sun.corba.se.impl.encoding.EncapsInputStream;
 import processing.core.PApplet;
 import processing.core.PImage;
 
@@ -17,12 +18,16 @@ public class Tank extends Entity {
         //pApplet.rect(x, y-(radius/2), TANK_RADIUS, TANK_RADIUS);
     }
 
-    public void act() {
-        if(this.isAlive == false) {return;}
+    public void act(ArrayList<Entity> list) {
+        if (this.isAlive == false) {
+                return;
+        }
+
         x += speed;
-        if(x > 400) {
+        if (x > 800) {
             Game.increaseTanksDestroyed();
             this.setAlive(false);
+            //Game.shields--;
         }
     }
 }
