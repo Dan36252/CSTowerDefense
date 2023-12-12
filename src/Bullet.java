@@ -16,7 +16,7 @@ public class Bullet extends Entity {
         pApplet.ellipse(x, y, BULLET_RADIUS, BULLET_RADIUS);
     }
 
-    public void act(ArrayList<Entity> list) {
+    public void act() {
         if(this.isAlive == false) {
             return;
         }

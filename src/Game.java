@@ -17,7 +17,7 @@ public class Game extends PApplet {
     private static int xPos;
     private static int lastTanksDestroyed;
 
-    private static ArrayList<Entity> entities;
+    public static ArrayList<Entity> entities;
 
     private static int timer;
 
@@ -39,6 +39,7 @@ public class Game extends PApplet {
         xPos = 800;
         lastTanksDestroyed = 0;
         timer = 0;
+    }
 
     @Override
     public void mouseClicked() {
@@ -87,19 +88,6 @@ public class Game extends PApplet {
                 entities.add(t);
             }
 
-            if (tanksDestroyed % 5 == 0 && tanksDestroyed > 0) {
-                if (tanksDestroyed == lastTanksDestroyed) {
-                    return;
-                }
-                lastTanksDestroyed = tanksDestroyed;
-                if (towerCount % 2 == 0) {
-                    xPos -= 40;
-                }
-                int yPos = 260 + 240 * (towerCount % 2);
-                Tower r = new Tower(xPos, yPos);
-                entities.add(r);
-                towerCount++;
-            }
 //        ellipse(mouseX, mouseY, 60, 60);  // draw circle at mouse loc
 //        ellipse(mouseX - 80, mouseY, 60, 60);  // draw circle at mouse loc
 //        ellipse(mouseX + 80, mouseY, 60, 60);  // draw circle at mouse loc

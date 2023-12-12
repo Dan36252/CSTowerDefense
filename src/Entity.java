@@ -22,7 +22,7 @@ public class Entity {
 
     public void drawTexture(PApplet pApplet){}
     public void drawTexture(PApplet pApplet, PImage texture){}
-    public void act(ArrayList<Entity> list) {}
+    public void act() {}
 
     public int getX(){
         return x;

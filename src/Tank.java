@@ -19,7 +19,7 @@ public class Tank extends Entity {
         //pApplet.rect(x, y-(radius/2), TANK_RADIUS, TANK_RADIUS);
     }
 
-    public void act(ArrayList<Entity> list) {
+    public void act() {
         if(this.isAlive == false) {
             //list.remove(list.size()-1);
             return;
