@@ -101,7 +101,7 @@ public class Game extends PApplet {
                 e.printStackTrace();
             }
 
-            resetBoard();
+            paused = true;
         }
 
         if (key == 'r') {
@@ -166,42 +166,59 @@ public class Game extends PApplet {
         }
 
 
-//        if (key == 'l') {
-//            try {
-//                System.out.println("l pressed");
-//
-//                BufferedReader in = new BufferedReader(new FileReader("saveGame.txt"));
-//                resetBoard();
-//
-//                String line;
-//                while ((line = in.readLine()) != null) {
-//                    String[] vals = line.split (", ");
-//                    String type = vals[0];
-//                    int x = Integer.parseInt(vals[1]);
-//                    int y = Integer.parseInt(vals[2]);
-//                    double speed = Double.parseDouble(vals[3]);
-//                    int radius = Integer.parseInt(vals[4]);
-//
-//                    Entity n = new Entity (type, x, y, speed, radius);
-//
-//
-//                    Game.tempEntities.add(n);
-//
-//                    for (int i = 0; i < entities.size(); i++) {
-//                        Game.tempEntities.add(Game.entities.get(i));
+        if (key == 'l') {
+            try {
+                System.out.println("l pressed");
+
+                paused = true;
+
+                BufferedReader in = new BufferedReader(new FileReader("saveGame.txt"));
+                resetBoard();
+
+                int i = 0;
+                String line;
+                while ((line = in.readLine()) != null) {
+                    String[] vals = line.split (", ");
+                    String type = vals[0];
+                    int x = Integer.parseInt(vals[1]);
+                    int y = Integer.parseInt(vals[2]);
+                    double speed = Double.parseDouble(vals[3]);
+                    int radius = Integer.parseInt(vals[4]);
+
+                    if (type.equals("tank")){
+                        Entity t = new Tank (x, y, speed, radius);
+                        Game.entities.add(t);
+                    }
+
+                    if (type.equals("tower")){
+                        Entity n = new Tower (x, y);
+                        Game.entities.add(n);
+                    }
+
+
+                    System.out.println(i + " " + Game.entities);
+                    i++;
+
+                }
+
+                in.close();
+
+//                for (Entity e : entities) {
+//                    index++;
+//                    if (e.getType().equals("tank")) {
+//                        e.drawTexture(this, tankTexture);
+//                    } else {
+//                        e.drawTexture(this);
 //                    }
 //
-//                    Game.entities = Game.tempEntities;
-//                    Game.tempEntities.clear();
+//                    e.act(entities);
 //                }
-//
-//                in.close();
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//        }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     /***
@@ -283,6 +300,8 @@ public class Game extends PApplet {
                 i--;
             }
         }
+
+        System.out.println("Drawing " + entities.size() + " entities");
         for (Entity e : entities) {
             index++;
             if (e.getType().equals("tank")) {

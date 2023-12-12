@@ -11,8 +11,14 @@ public class Tank extends Entity {
         super("tank", -TANK_RADIUS, 400, TANK_SPEED, TANK_RADIUS);
     }
 
+    public Tank(int x, int y, double speed, int radius) {
+        super("tank", x, y, TANK_SPEED, TANK_RADIUS);
+    }
+
     public void drawTexture(PApplet pApplet, PImage texture) {
-        if(this.isAlive == false) {return;}
+        if(this.isAlive == false) {
+            return;
+        }
         pApplet.fill(40, 150, 40);
         pApplet.image(texture, x, y-(radius/2), radius, radius);
         //pApplet.rect(x, y-(radius/2), TANK_RADIUS, TANK_RADIUS);
@@ -30,4 +36,10 @@ public class Tank extends Entity {
             //Game.shields--;
         }
     }
+
+    public void drawTexture(PApplet pApplet) {
+        pApplet.fill(0, 50, 255);
+        pApplet.rect(x, y, radius, radius);
+    }
+
 }
