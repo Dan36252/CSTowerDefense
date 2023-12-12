@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class Tower extends Entity{
     private static double TOWER_SHOOT_SPEED = 0.01;
-    private static int TOWER_RADIUS = 40;
+    public static int TOWER_RADIUS = 40;
 
     public Tower(int x, int y) {
         super("tower", x, y, TOWER_SHOOT_SPEED, TOWER_RADIUS);
@@ -14,8 +14,9 @@ public class Tower extends Entity{
     public static void PlaceOnGrid(int mouseX, int mouseY) {
         if(isValidPos(mouseX, mouseY)) {
             int[] gridPos = getGridPosFromRaw(mouseX, mouseY);
-            if(isClear(gridPos[0], gridPos[1])) {
+            if(isClear(gridPos[0], gridPos[1]) && Game.canPlaceTower()) {
                 Game.entities.add(new Tower(gridPos[0], gridPos[1]));
+                Game.towerPlaced();
                 System.out.println("Placed Grid Pos: " + gridPos[0] + ", " + gridPos[1]);
             }
         }
@@ -41,7 +42,8 @@ public class Tower extends Entity{
         ArrayList<Entity> list = Game.entities;
         for (int i = 0; i < list.size(); i++) {
             Entity e = list.get(i);
-            if(e.typeName.equals("Tower") && e.x == gridX && e.y == gridY) clear = false;
+            System.out.println(e.typeName);
+            if(e.typeName.equals("tower") && e.x == gridX && e.y == gridY) clear = false;
         }
         return clear;
     }

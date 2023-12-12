@@ -20,6 +20,8 @@ public class Game extends PApplet {
     private static int tanksSpawned;
 
     private static int xPos;
+    public static int pathPosY;
+    public static int pathWidth;
     private static int lastTanksDestroyed;
     private static int lastTimerDecreaseTankNum;
 
@@ -54,6 +56,8 @@ public class Game extends PApplet {
         entities = new ArrayList<>();
         tempEntities = new ArrayList<>();
         xPos = 800;
+        pathPosY = 300;
+        pathWidth = 200;
         lastTanksDestroyed = 0;
         lastTimerDecreaseTankNum = 0;
         timer = 0;
@@ -66,6 +70,18 @@ public class Game extends PApplet {
     private void resetBoard(){
         setup();
         Game.entities.clear();
+    }
+
+    public static boolean canPlaceTower(){
+        boolean canPlace = true;
+        if(paused) canPlace = false;
+        if(lost) canPlace = false;
+        if(money-towerCost < 0) canPlace = false;
+        return canPlace;
+    }
+
+    public static void towerPlaced() {
+        money -= towerCost;
     }
 
     public void keyReleased(){
@@ -204,14 +220,27 @@ public class Game extends PApplet {
 //        }
     }
 
+    public void mouseClicked() {
+        System.out.println("Mouse Clicked");
+        Tower.PlaceOnGrid(mouseX, mouseY);
+    }
+
     /***
      * Draws each frame to the screen.  Runs automatically in a loop at frameRate frames a second.
      * tick each object (have it update itself), and draw each object
      */
     public void draw() {
-        background(255);    // paint screen white
-        fill(0, 255, 0);          // load green paint color
-        rect(0, 300, 800, 200);
+        background(255);
+
+        // Tower placing indicator
+        fill(220, 220, 220);
+        int[] gridPos = Tower.getGridPosFromRaw(mouseX, mouseY);
+        rect(gridPos[0], gridPos[1], Tower.TOWER_RADIUS, Tower.TOWER_RADIUS);
+
+        // Path drawing
+        fill(0, 255, 0);
+        rect(0, pathPosY, 800, pathWidth);
+
         PImage img = new PImage();
 
         textSize(13);
