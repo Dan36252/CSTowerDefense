@@ -1,5 +1,4 @@
 import processing.core.PApplet;
-import processing.core.PFont;
 import processing.core.PImage;
 
 import java.io.*;
@@ -8,21 +7,30 @@ import java.util.ArrayList;
 public class Game extends PApplet {
     // TODO: declare game variables
     public static PImage tankTexture;
-    public static int money;
-    public static int lives;
-    public static int tanksDestroyed;
-    public static int towerCount;
-    public static int pathPosY;
-    public static int pathWidth;
+    private static int money;
+    private static int towerCost;
+    private static int tankReward;
+    public static int shields;
+    private static int shieldCost;
+    private static int shieldTax;
+    private static int shieldsBoughtCounter;
+    private static boolean canPurchaseShields;
+    private static int tanksDestroyed;
+    private static int towerCount;
+    private static int tanksSpawned;
 
     private static int xPos;
     private static int lastTanksDestroyed;
+    private static int lastTimerDecreaseTankNum;
 
     public static ArrayList<Entity> entities;
     public static ArrayList<Entity> tempEntities;
     private static int timer;
+    private static int maxTimer;
     private static boolean paused;
+    private static boolean lost;
     public static int index;
+
 
 
     public void settings() {
@@ -34,94 +42,30 @@ public class Game extends PApplet {
         // TODO: initialize game variables
         tankTexture = loadImage("assets/TankTexture.png");
         money = 0;
-        lives = 5;
+        towerCost = 10;
+        tankReward = 5;
+        shields = 5;
+        shieldCost = 50;
+        shieldTax = 1;
+        shieldsBoughtCounter = 0;
+        canPurchaseShields = false;
+        tanksSpawned = 0;
         tanksDestroyed = 0;
-        pathPosY = 300;
-        pathWidth = 200;
         entities = new ArrayList<>();
         tempEntities = new ArrayList<>();
         xPos = 800;
         lastTanksDestroyed = 0;
+        lastTimerDecreaseTankNum = 0;
         timer = 0;
+        maxTimer = 100;
         index = 0;
-        paused = false;
+        paused = true;
+        lost = false;
     }
 
     private void resetBoard(){
-        paused = true;
-        index = 0;
-        towerCount = 0;
-        tanksDestroyed = 0;
-        lastTanksDestroyed = 0;
-        xPos = 800;
-        timer = 0;
+        setup();
         Game.entities.clear();
-    }
-
-    @Override
-    public void mouseClicked() {
-        System.out.println("Mouse Pressed: "+mouseX+", "+mouseY);
-        Tower.PlaceOnGrid(mouseX, mouseY);
-    }
-
-    /***
-     * Draws each frame to the screen.  Runs automatically in a loop at frameRate frames a second.
-     * tick each object (have it update itself), and draw each object
-     */
-    public void draw() {
-        background(255);    // paint screen white
-        fill(0,255,0);          // load green paint color
-        rect(0, pathPosY, 800, pathWidth);
-        fill(220, 220, 220);
-        int[] gridPos = Tower.getGridPosFromRaw(mouseX, mouseY);
-        rect(gridPos[0], gridPos[1], 40, 40);
-        PImage img = new PImage();
-
-        fill(0,255,0);
-
-
-        for (Entity e : entities) {
-            index++;
-            if(e.getType() == "tank") {
-                e.drawTexture(this, tankTexture);
-            } else {
-                e.drawTexture(this);
-            }
-
-            if (paused == false) {
-                e.act(entities);
-            }
-        }
-
-        textSize(13);
-        fill(0);
-        text("Tanks Destroyed: " + tanksDestroyed, 20, 20);
-        text("Money: " + money, 20, 40);
-        text("Lives: " + lives, 20, 60);
-
-        if(paused == false) timer--;
-        if (timer <= 0) {
-            timer = 100;
-            Tank t = new Tank();
-            entities.add(t);
-        }
-
-//        if (tanksDestroyed % 5 == 0 && tanksDestroyed > 0) {
-//            if (tanksDestroyed == lastTanksDestroyed) {
-//                return;
-//            }
-//            lastTanksDestroyed = tanksDestroyed;
-//            if (towerCount % 2 == 0) {
-//                xPos -= 40;
-//            }
-//            int yPos = 260 + 240 * (towerCount % 2);
-//            Tower r = new Tower(xPos, yPos);
-//            entities.add(r);
-//            towerCount++;
-//        }
-//        ellipse(mouseX, mouseY, 60, 60);  // draw circle at mouse loc
-//        ellipse(mouseX - 80, mouseY, 60, 60);  // draw circle at mouse loc
-//        ellipse(mouseX + 80, mouseY, 60, 60);  // draw circle at mouse loc
     }
 
     public void keyReleased(){
@@ -142,6 +86,17 @@ public class Game extends PApplet {
 
                 out.close();
 
+                PrintWriter out2 = new PrintWriter(new FileWriter("gameStats.txt"));
+                out2.println("Tanks Destroyed: " + tanksDestroyed);
+                out2.println("Money: " + money);
+                out2.println("Tank Reward: " + tankReward);
+                out2.println("Tower Cost: " + towerCost);
+                out2.println("Shields: " + shields);
+                out2.println("Paused: " + paused);
+
+                out2.close();
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -155,59 +110,259 @@ public class Game extends PApplet {
         }
 
         if (key == 'p') {
-            System.out.println("p pressed");
-            paused = !paused;
-
-//            xPos = 800;
-//            index = 0;
-//            lastTanksDestroyed = 0;
+            //System.out.println("p pressed");
+            if (!lost) {
+                paused = !paused;
+            }
         }
 
-        if (key == 'l') {
-            try {
-                System.out.println("l pressed");
-
-                BufferedReader in = new BufferedReader(new FileReader("saveGame.txt"));
-                resetBoard();
-
-                String line;
-                while ((line = in.readLine()) != null) {
-                    String[] vals = line.split (", ");
-                    String type = vals[0];
-                    int x = Integer.parseInt(vals[1]);
-                    int y = Integer.parseInt(vals[2]);
-                    double speed = Double.parseDouble(vals[3]);
-                    int radius = Integer.parseInt(vals[4]);
-
-                    Entity n = new Entity (type, x, y, speed, radius);
-
-
-                    Game.tempEntities.add(n);
-
-                    for (int i = 0; i < entities.size(); i++) {
-                        Game.tempEntities.add(Game.entities.get(i));
-                    }
-
-                    Game.entities = Game.tempEntities;
-                    Game.tempEntities.clear();
+        if (key == 'i') {
+            if(!lost) {
+                if (money - shieldCost >= 0) {
+                    money -= shieldCost;
+                    shields++;
+                    shieldsBoughtCounter++;
+                    shieldCost += shieldTax;
+                    shieldTax += shieldsBoughtCounter;
                 }
+            }
+        }
 
-                in.close();
+        // developer key
+        if (key == 'd') {
+            if (!lost) {
+                money += 10;
+            }
+        }
 
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (key == 'c') {
+            if (!lost) {
+                money = 0;
+            }
+        }
+
+        if (key == 'k') {
+            if (!lost) {
+                shields--;
+            }
+        }
+
+        if (key == 'j') {
+            if (!lost) {
+                shields = 5;
+            }
+        }
+
+        if (key == 'b') {
+            if (!lost) {
+                maxTimer = 20;
+            }
+        }
+
+        if (key == 'a') {
+            if (!lost) {
+                maxTimer++;
+            }
+        }
+
+
+//        if (key == 'l') {
+//            try {
+//                System.out.println("l pressed");
+//
+//                BufferedReader in = new BufferedReader(new FileReader("saveGame.txt"));
+//                resetBoard();
+//
+//                String line;
+//                while ((line = in.readLine()) != null) {
+//                    String[] vals = line.split (", ");
+//                    String type = vals[0];
+//                    int x = Integer.parseInt(vals[1]);
+//                    int y = Integer.parseInt(vals[2]);
+//                    double speed = Double.parseDouble(vals[3]);
+//                    int radius = Integer.parseInt(vals[4]);
+//
+//                    Entity n = new Entity (type, x, y, speed, radius);
+//
+//
+//                    Game.tempEntities.add(n);
+//
+//                    for (int i = 0; i < entities.size(); i++) {
+//                        Game.tempEntities.add(Game.entities.get(i));
+//                    }
+//
+//                    Game.entities = Game.tempEntities;
+//                    Game.tempEntities.clear();
+//                }
+//
+//                in.close();
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
+    }
+
+    /***
+     * Draws each frame to the screen.  Runs automatically in a loop at frameRate frames a second.
+     * tick each object (have it update itself), and draw each object
+     */
+    public void draw() {
+        background(255);    // paint screen white
+        fill(0, 255, 0);          // load green paint color
+        rect(0, 300, 800, 200);
+        PImage img = new PImage();
+
+        textSize(13);
+        fill(0);
+        int x = 20;
+        text("Tanks Destroyed: " + tanksDestroyed, x, 20);
+        text("Money: $" + money, x, 40);
+        text("Tank Reward: $" + tankReward, x, 60);
+        text("Tower Cost: $" + towerCost, x, 80);
+        text("Shields: " + shields, x, 100);
+        text("Can Purchase Shield?: " + canPurchaseShields, x, 120);
+        text("Paused: " + paused, x, 160);
+        text("Entity List: " + entities.size(), x, 180);
+//        text("Timer: " + timer, x, 200);
+        text("Tank Frequency: " + maxTimer, x, 200);
+        text("Tank Spawned: " + tanksSpawned, x, 220);
+//        text("Last Timer Decrease: " + lastTimerDecreaseTankNum, x, 260);
+
+
+        String pauseState;
+        if (paused){
+            pauseState = "play";
+        } else{
+            pauseState = "pause";
+        }
+
+        if (!lost) {
+            int x2 = 600;
+            text("'r' to reset", x2, 20);
+            text("'p' to " + pauseState, x2, 40);
+            text("'i' to by a shield for $" + shieldCost, x2, 60);
+            text("'s' to save game", x2, 80);
+            //text("'l' to load", x2, 100);
+
+            text("Developer Keys", x2 + 40, 120);
+            text("'d' to add $10 to money", x2, 140);
+            text("'c' to clear money", x2, 160);
+            text("'k' to loose a shield", x2, 180);
+            text("'j' to return to 5 shields", x2, 200);
+            text("'b' to make maxTimer = 20", x2, 220);
+            text("'a' to slow down tank frequency", x2, 240);
+
+        }
+
+        if (lost) {
+            int x3 = 330;
+            textSize(24);
+            text("GAME OVER!", x3, 50);
+
+            textSize(18);
+            text("'r' to reset", x3 + 25, 80);
+
+        }
+
+        fill(0, 255, 0);
+
+        if (money < 0){
+            paused = true;
+        }
+
+        if (shields <= 0) {
+            lost = true;
+            paused = true;
+        }
+
+        for (int i = 0; i < entities.size(); i++) {
+            if (!entities.get(i).getIsAlive()) {
+                entities.remove(i);
+                i--;
+            }
+        }
+        for (Entity e : entities) {
+            index++;
+            if (e.getType().equals("tank")) {
+                e.drawTexture(this, tankTexture);
+            } else {
+                e.drawTexture(this);
             }
 
+            if (!paused) {
+                e.act(entities);
+            }
+        }
 
+        if (!paused) {
+            timer--;
 
         }
 
+        if (timer <= 0) {
+            timer = maxTimer;
+            Tank t = new Tank();
+            entities.add(t);
+            tanksSpawned++;
+        }
+
+        if(money - towerCost >= 0) {
+            if (tanksDestroyed % 10 == 0 && tanksDestroyed > 0) {
+                if (tanksDestroyed == lastTanksDestroyed) {
+                    return;
+                }
+                lastTanksDestroyed = tanksDestroyed;
+                if (towerCount % 2 == 0) {
+                    xPos -= 40;
+                }
+                int yPos = 260 + 240 * (towerCount % 2);
+                Tower r = new Tower(xPos, yPos);
+                entities.add(r);
+                towerCount++;
+
+                money -= towerCost;
+                towerCost += 5;
+            }
+        }
+
+        if (tanksSpawned % 10 == 0 && tanksSpawned > 0 && maxTimer > 16) {
+            if (tanksSpawned == lastTimerDecreaseTankNum) {
+                return;
+            }
+
+            lastTimerDecreaseTankNum = tanksSpawned;
+
+            maxTimer --;
+        }
+
+        if (!lost) {
+            canPurchaseShields = money - shieldCost >= 0;
+        } else{
+            canPurchaseShields = false;
+        }
+
+
+
+//        ellipse(mouseX, mouseY, 60, 60);  // draw circle at mouse loc
+//        ellipse(mouseX - 80, mouseY, 60, 60);  // draw circle at mouse loc
+//        ellipse(mouseX + 80, mouseY, 60, 60);  // draw circle at mouse loc
     }
 
 
     public static void increaseTanksDestroyed(){
         tanksDestroyed++;
-        money += 10;
+
+        if (tanksDestroyed % 10 == 0){
+            tankReward += 2;
+        }
+
+        if (tanksDestroyed % 50 == 0){
+            tankReward += 10 * (tanksDestroyed/50.0);
+        }
+
+        money += tankReward;
     }
 
     public static void main(String[] args) {
