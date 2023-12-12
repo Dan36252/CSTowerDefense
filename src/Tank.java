@@ -19,14 +19,15 @@ public class Tank extends Entity {
     }
 
     public void act(ArrayList<Entity> list) {
-        if(this.isAlive == false) {
-            //list.remove(list.size()-1);
-            return;
+        if (this.isAlive == false) {
+                return;
         }
+
         x += speed;
-        if(x > 400) {
+        if (x > 800) {
             Game.increaseTanksDestroyed();
             this.setAlive(false);
+            //Game.shields--;
         }
     }
 }

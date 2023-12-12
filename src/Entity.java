@@ -45,6 +45,9 @@ public class Entity {
     }
 
     public void setAlive(boolean alive){this.isAlive = alive;}
+    public boolean getIsAlive(){
+        return isAlive;
+    }
     public String getType() {
         return this.typeName;
     }
