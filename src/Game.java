@@ -312,8 +312,8 @@ public class Game extends PApplet {
                 i--;
             }
         }
-        for (Entity e : entities) {
-            index++;
+        for (int i = 0; i < entities.size(); i++) {
+            Entity e = entities.get(i);
             if (e.getType().equals("tank")) {
                 e.drawTexture(this, tankTexture);
             } else {
@@ -321,7 +321,7 @@ public class Game extends PApplet {
             }
 
             if (!paused) {
-                e.act(entities);
+                e.act();
             }
         }
 
@@ -332,28 +332,9 @@ public class Game extends PApplet {
 
         if (timer <= 0) {
             timer = maxTimer;
-            Tank t = new Tank();
+            Tank t = new Tank((int)((double)tanksDestroyed/10.0));
             entities.add(t);
             tanksSpawned++;
-        }
-
-        if(money - towerCost >= 0) {
-            if (tanksDestroyed % 10 == 0 && tanksDestroyed > 0) {
-                if (tanksDestroyed == lastTanksDestroyed) {
-                    return;
-                }
-                lastTanksDestroyed = tanksDestroyed;
-                if (towerCount % 2 == 0) {
-                    xPos -= 40;
-                }
-                int yPos = 260 + 240 * (towerCount % 2);
-                Tower r = new Tower(xPos, yPos);
-                entities.add(r);
-                towerCount++;
-
-                money -= towerCost;
-                towerCost += 5;
-            }
         }
 
         if (tanksSpawned % 10 == 0 && tanksSpawned > 0 && maxTimer > 16) {

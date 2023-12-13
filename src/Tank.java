@@ -6,9 +6,11 @@ import java.util.ArrayList;
 
 public class Tank extends Entity {
     private static double TANK_SPEED = 2;
-    private static int TANK_RADIUS = 30;
-    public Tank() {
+    public static int TANK_RADIUS = 30;
+    private int lives;
+    public Tank(int lives) {
         super("tank", -TANK_RADIUS, 400, TANK_SPEED, TANK_RADIUS);
+        this.lives = lives;
     }
 
     public void drawTexture(PApplet pApplet, PImage texture) {
@@ -18,7 +20,16 @@ public class Tank extends Entity {
         //pApplet.rect(x, y-(radius/2), TANK_RADIUS, TANK_RADIUS);
     }
 
-    public void act(ArrayList<Entity> list) {
+    public void tankHit(){
+        //System.out.println("hit!");
+        lives--;
+        if(lives <= 0) {
+            Game.increaseTanksDestroyed();
+            setAlive(false);
+        }
+    }
+
+    public void act() {
         if (this.isAlive == false) {
                 return;
         }
