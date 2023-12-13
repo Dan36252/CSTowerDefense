@@ -1,6 +1,17 @@
-Tanks Destroyed: 0
-Money: 0
-Tank Reward: 5
-Tower Cost: 10
-Shields: 5
-Paused: false
+Money: 58050
+Tower Cost: 310
+Tank Reward: 905
+Shields: 46
+ShieldCost: 11571
+ShieldTax: 862
+ShieldsBoughtCounter: 41
+Tanks Spawned: 610
+Tanks Destroyed: 600
+Tower Count: 661
+xPos: -400
+LastTankDestroyed: 600
+LastTimerDecreaseTankNum: 610
+Timer: 11
+Tank Frequency: 39
+Index: 1421995
+Lost?: false

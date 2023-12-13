@@ -69,41 +69,6 @@ public class Game extends PApplet {
     }
 
     public void keyReleased(){
-        if (key == 's') {
-
-            System.out.println("s pressed");
-
-            // save all point data to a file
-            try {
-                PrintWriter out = new PrintWriter(new FileWriter("saveGame.txt"));
-
-
-                for (int i = 0; i < Game.entities.size(); i++) {
-                    Entity e = Game.entities.get(i);
-
-                    out.println(e.getEntityType() + ", " + e.getX() + ", " + e.getY()  + ", " + e.getSpeed() + ", " + e.getRadius());
-                }
-
-                out.close();
-
-                PrintWriter out2 = new PrintWriter(new FileWriter("gameStats.txt"));
-                out2.println("Tanks Destroyed: " + tanksDestroyed);
-                out2.println("Money: " + money);
-                out2.println("Tank Reward: " + tankReward);
-                out2.println("Tower Cost: " + towerCost);
-                out2.println("Shields: " + shields);
-                out2.println("Paused: " + paused);
-
-                out2.close();
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            paused = true;
-        }
-
         if (key == 'r') {
             System.out.println("r pressed");
             resetBoard();
@@ -165,20 +130,73 @@ public class Game extends PApplet {
             }
         }
 
+        if (key == 's') {
+
+            System.out.println("s pressed");
+
+            // save all point data to a file
+            try {
+                PrintWriter out = new PrintWriter(new FileWriter("saveGame.txt"));
+
+
+                for (int i = 0; i < Game.entities.size(); i++) {
+                    Entity e = Game.entities.get(i);
+
+                    out.println(e.getEntityType() + ", " + e.getX() + ", " + e.getY()  + ", " + e.getSpeed() + ", " + e.getRadius());
+                }
+
+                out.close();
+
+                PrintWriter out2 = new PrintWriter(new FileWriter("gameStats.txt"));
+
+                out2.println("Money: " + money);
+                out2.println("Tower Cost: " + towerCost);
+                out2.println("Tank Reward: " + tankReward);
+                out2.println("Shields: " + shields);
+                out2.println("ShieldCost: " + shieldCost);
+                out2.println("ShieldTax: " + shieldTax);
+                out2.println("ShieldsBoughtCounter: " + shieldsBoughtCounter);
+                out2.println("Tanks Spawned: " + tanksSpawned);
+                out2.println("Tanks Destroyed: " + tanksDestroyed);
+                out2.println("Tower Count: " + towerCount);
+                out2.println("xPos: " + xPos);
+                out2.println("LastTankDestroyed: " + lastTanksDestroyed);
+                out2.println("LastTimerDecreaseTankNum: " + lastTimerDecreaseTankNum);
+                out2.println("Timer: " + timer);
+                out2.println("Tank Frequency: " + maxTimer);
+                out2.println("Index: " + index);
+                out2.println("Lost?: " + lost);
+
+
+
+                out2.close();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            paused = true;
+        }
 
         if (key == 'l') {
-            try {
-                System.out.println("l pressed");
+            System.out.println("l pressed");
 
+            try {
                 paused = true;
 
                 BufferedReader in = new BufferedReader(new FileReader("saveGame.txt"));
-                resetBoard();
+                BufferedReader in2 = new BufferedReader(new FileReader("gameStats.txt"));
+                Game.entities.clear();
 
                 int i = 0;
                 String line;
                 while ((line = in.readLine()) != null) {
                     String[] vals = line.split (", ");
+//                    for (int j = 0; j < vals.length; j++) {
+//                        System.out.println(j + ": " + vals[j]);
+//                    }
+
                     String type = vals[0];
                     int x = Integer.parseInt(vals[1]);
                     int y = Integer.parseInt(vals[2]);
@@ -196,23 +214,64 @@ public class Game extends PApplet {
                     }
 
 
-                    System.out.println(i + " " + Game.entities);
-                    i++;
+                    //System.out.println(i + " " + Game.entities);
+                    //i++;
 
                 }
 
                 in.close();
 
-//                for (Entity e : entities) {
-//                    index++;
-//                    if (e.getType().equals("tank")) {
-//                        e.drawTexture(this, tankTexture);
-//                    } else {
-//                        e.drawTexture(this);
-//                    }
+                System.out.println();
+
+                String line2;
+                ArrayList<String> statList = new ArrayList<>();
+
+                while ((line2 = in2.readLine()) != null) {
+                    String[] stats = line2.split (": ");
+                    statList.add(stats[1]);
+                }
+
+                in2.close();
+
+//                for (int j = 0; j < statList.size(); j++) {
+//                    System.out.println(statList.get(j));
 //
-//                    e.act(entities);
 //                }
+                int loc = 0;
+                money = Integer.parseInt(statList.get(loc));
+                loc++;
+                towerCost = Integer.parseInt(statList.get(loc));
+                loc++;
+                tankReward = Integer.parseInt(statList.get(loc));
+                loc++;
+                shields = Integer.parseInt(statList.get(loc));
+                loc++;
+                shieldCost = Integer.parseInt(statList.get(loc));
+                loc++;
+                shieldTax = Integer.parseInt(statList.get(loc));
+                loc++;
+                shieldsBoughtCounter = Integer.parseInt(statList.get(loc));
+                loc++;
+                tanksSpawned = Integer.parseInt(statList.get(loc));
+                loc++;
+                tanksDestroyed = Integer.parseInt(statList.get(loc));
+                loc++;
+                towerCount = Integer.parseInt(statList.get(loc));
+                loc++;
+                xPos = Integer.parseInt(statList.get(loc));
+                loc++;
+                lastTanksDestroyed = Integer.parseInt(statList.get(loc));
+                loc++;
+                lastTimerDecreaseTankNum = Integer.parseInt(statList.get(loc));
+                loc++;
+                timer = Integer.parseInt(statList.get(loc));
+                loc++;
+                maxTimer = Integer.parseInt(statList.get(loc));
+                loc++;
+                index = Integer.parseInt(statList.get(loc));
+                loc++;
+                lost = Boolean.parseBoolean(statList.get(loc));
+
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -234,18 +293,32 @@ public class Game extends PApplet {
         textSize(13);
         fill(0);
         int x = 20;
-        text("Tanks Destroyed: " + tanksDestroyed, x, 20);
-        text("Money: $" + money, x, 40);
-        text("Tank Reward: $" + tankReward, x, 60);
-        text("Tower Cost: $" + towerCost, x, 80);
-        text("Shields: " + shields, x, 100);
-        text("Can Purchase Shield?: " + canPurchaseShields, x, 120);
-        text("Paused: " + paused, x, 160);
-        text("Entity List: " + entities.size(), x, 180);
-//        text("Timer: " + timer, x, 200);
-        text("Tank Frequency: " + maxTimer, x, 200);
-        text("Tank Spawned: " + tanksSpawned, x, 220);
-//        text("Last Timer Decrease: " + lastTimerDecreaseTankNum, x, 260);
+        int y = 20;
+        text("Tanks Destroyed: " + tanksDestroyed, x, y);
+        y += 20;
+        text("Money: $" + money, x, y);
+        y += 20;
+        text("Tank Reward: $" + tankReward, x, y);
+        y += 20;
+        text("Tower Cost: $" + towerCost, x, y);
+        y += 20;
+        text("Shields: " + shields, x, y);
+        y += 20;
+        text("Can Purchase Shield?: " + canPurchaseShields, x, y);
+        y += 20;
+
+//        y += 20;
+//        text("Paused: " + paused, x, y);
+        y += 20;
+        text("Entity List: " + entities.size(), x, y);
+        y += 20;
+//        text("Timer: " + timer, x, y);
+//        y += 20;
+        text("Tank Frequency: " + maxTimer, x, y);
+        y += 20;
+        text("Tank Spawned: " + tanksSpawned, x, y);
+        y += 20;
+//        text("Last Timer Decrease: " + lastTimerDecreaseTankNum, x, y);
 
 
         String pauseState;
@@ -257,22 +330,34 @@ public class Game extends PApplet {
 
         if (!lost) {
             int x2 = 600;
-            text("'r' to reset", x2, 20);
-            text("'p' to " + pauseState, x2, 40);
-            text("'i' to by a shield for $" + shieldCost, x2, 60);
-            text("'s' to save game", x2, 80);
-            //text("'l' to load", x2, 100);
+            int y2 = 20;
+            text("'r' to reset", x2, y2);
+            y2 += 20;
+            text("'p' to " + pauseState, x2, y2);
+            y2 += 20;
+            text("'i' to by a shield for $" + shieldCost, x2, y2);
+            y2 += 20;
+            text("'s' to save game", x2, y2);
+            y2 += 20;
+            text("'l' to load saved data", x2, y2);
+            y2 += 20;
 
-            text("Developer Keys", x2 + 40, 120);
-            text("'d' to add $10 to money", x2, 140);
-            text("'c' to clear money", x2, 160);
-            text("'k' to loose a shield", x2, 180);
-            text("'j' to return to 5 shields", x2, 200);
-            text("'b' to make maxTimer = 20", x2, 220);
-            text("'a' to slow down tank frequency", x2, 240);
+            y2 += 20;
+            text("'d' to add $10 to money", x2, y2);
+            y2 += 20;
+            text("'c' to clear money", x2, y2);
+            y2 += 20;
+            text("'k' to loose a shield", x2, y2);
+            y2 += 20;
+            text("'j' to return to 5 shields", x2, y2);
+            y2 += 20;
+            text("'b' to make maxTimer = 20", x2, y2);
+            y2 += 20;
+            text("'a' to slow down tank frequency", x2, y2);
 
         }
 
+        // GAME OVER MESSAGE
         if (lost) {
             int x3 = 330;
             textSize(24);
@@ -294,6 +379,7 @@ public class Game extends PApplet {
             paused = true;
         }
 
+        // REMOVES DEAD TANKS
         for (int i = 0; i < entities.size(); i++) {
             if (!entities.get(i).getIsAlive()) {
                 entities.remove(i);
@@ -301,7 +387,9 @@ public class Game extends PApplet {
             }
         }
 
-        System.out.println("Drawing " + entities.size() + " entities");
+        //System.out.println("Drawing " + entities.size() + " entities");
+
+        // DRAWS ENTITIES
         for (Entity e : entities) {
             index++;
             if (e.getType().equals("tank")) {
@@ -315,18 +403,18 @@ public class Game extends PApplet {
             }
         }
 
+        // TANK SPAWNER
         if (!paused) {
             timer--;
-
+            if (timer <= 0) {
+                timer = maxTimer;
+                Tank t = new Tank();
+                entities.add(t);
+                tanksSpawned++;
+            }
         }
 
-        if (timer <= 0) {
-            timer = maxTimer;
-            Tank t = new Tank();
-            entities.add(t);
-            tanksSpawned++;
-        }
-
+        // TOWER SPAWNER
         if(money - towerCost >= 0) {
             if (tanksDestroyed % 10 == 0 && tanksDestroyed > 0) {
                 if (tanksDestroyed == lastTanksDestroyed) {
@@ -346,6 +434,7 @@ public class Game extends PApplet {
             }
         }
 
+        // SHIELD PURCHASING
         if (tanksSpawned % 10 == 0 && tanksSpawned > 0 && maxTimer > 16) {
             if (tanksSpawned == lastTimerDecreaseTankNum) {
                 return;
@@ -363,12 +452,10 @@ public class Game extends PApplet {
         }
 
 
-
 //        ellipse(mouseX, mouseY, 60, 60);  // draw circle at mouse loc
 //        ellipse(mouseX - 80, mouseY, 60, 60);  // draw circle at mouse loc
 //        ellipse(mouseX + 80, mouseY, 60, 60);  // draw circle at mouse loc
     }
-
 
     public static void increaseTanksDestroyed(){
         tanksDestroyed++;
