@@ -3,4 +3,4 @@ Money: 0
 Tank Reward: 5
 Tower Cost: 10
 Shields: 5
-Paused: true
+Paused: false

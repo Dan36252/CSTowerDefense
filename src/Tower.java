@@ -1,4 +1,7 @@
 import processing.core.PApplet;
+import processing.core.PImage;
+
+import java.util.ArrayList;
 
 import java.net.Proxy;
 import java.util.ArrayList;
@@ -105,5 +108,14 @@ public class Tower extends Entity{
 
         }
         timer--;
+    }
+
+    @Override
+    public void drawTexture(PApplet pApplet, PImage texture) {
+        System.err.println("not implemented texture");
+    }
+
+    public void act(ArrayList<Entity> list) {
+        return;
     }
 }

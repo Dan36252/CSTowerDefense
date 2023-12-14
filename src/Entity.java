@@ -3,7 +3,7 @@ import processing.core.PImage;
 
 import java.util.ArrayList;
 
-public class Entity {
+public abstract class Entity {
     protected String typeName;
     protected int x, y;
     protected double speed;
@@ -19,10 +19,10 @@ public class Entity {
     }
 
 
+    public abstract void drawTexture(PApplet pApplet);
 
-    public void drawTexture(PApplet pApplet){}
-    public void drawTexture(PApplet pApplet, PImage texture){}
-    public void act() {}
+    public abstract void drawTexture(PApplet pApplet, PImage texture);
+    public abstract void act(ArrayList<Entity> list);
 
     public int getX(){
         return x;
@@ -52,7 +52,7 @@ public class Entity {
         return this.typeName;
     }
 
-    public String toString() {
-        return (typeName+", "+x+", "+y);
+    public String toString(){
+        return ("[" + typeName + ", " + x + ", " + y + "]");
     }
 }
