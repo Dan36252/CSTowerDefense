@@ -4,7 +4,7 @@ import processing.core.PImage;
 import java.util.ArrayList;
 
 public class Bullet extends Entity {
-    private static double BULLET_SPEED = 8;
+    private static double BULLET_SPEED = 10;
     private static int BULLET_RADIUS = 10;
     private static int shootOffsetX = 30;
     private double speedX = 0;
@@ -13,7 +13,7 @@ public class Bullet extends Entity {
     private Tank target;
     private boolean canHit = true;
     public Bullet(int x, int y, Tower origin, Tank target) {
-        super("bullet", x, y, BULLET_SPEED, BULLET_RADIUS);
+        super("bullet", x, y, BULLET_SPEED, BULLET_RADIUS, 0);
         this.origin = origin;
         this.target = target;
 //        double[] speeds = calculateSpeeds();

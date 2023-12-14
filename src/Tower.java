@@ -15,7 +15,7 @@ public class Tower extends Entity{
     private Tank target = null;
 
     public Tower(int x, int y) {
-        super("tower", x, y, TOWER_SHOOT_SPEED, TOWER_RADIUS);
+        super("tower", x, y, TOWER_SHOOT_SPEED, TOWER_RADIUS, 0);
     }
 
     public static void PlaceOnGrid(int mouseX, int mouseY) {

@@ -7,14 +7,13 @@ import java.util.ArrayList;
 public class Tank extends Entity {
     private static double TANK_SPEED = 2;
     public static int TANK_RADIUS = 30;
-    private int lives;
     public Tank(int lives) {
-        super("tank", -TANK_RADIUS, 400, TANK_SPEED, TANK_RADIUS);
+        super("tank", -TANK_RADIUS, 400, TANK_SPEED, TANK_RADIUS, lives);
         this.lives = lives;
     }
 
-    public Tank(int x, int y, double speed, int radius) {
-        super("tank", x, y, TANK_SPEED, TANK_RADIUS);
+    public Tank(int x, int y, int lives) {
+        super("tank", x, y, TANK_SPEED, TANK_RADIUS, lives);
     }
 
     public void drawTexture(PApplet pApplet, PImage texture) {
@@ -23,6 +22,8 @@ public class Tank extends Entity {
         }
         pApplet.fill(40, 150, 40);
         pApplet.image(texture, x, y-(radius/2), radius, radius);
+        pApplet.fill(230, 20, 20);
+        pApplet.text(lives+" lives", x, y-(radius/2)-10);
         //pApplet.rect(x, y-(radius/2), TANK_RADIUS, TANK_RADIUS);
     }
 
@@ -42,7 +43,7 @@ public class Tank extends Entity {
 
         x += speed;
         if (x > 800) {
-            Game.increaseTanksDestroyed();
+            Game.tankReachedEnd();
             this.setAlive(false);
             //Game.shields--;
         }

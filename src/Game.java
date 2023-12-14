@@ -10,6 +10,7 @@ public class Game extends PApplet {
     private static int money;
     private static int towerCost;
     private static int tankReward;
+    private static int towersPlaced;
     public static int shields;
     private static int shieldCost;
     private static int shieldTax;
@@ -43,9 +44,10 @@ public class Game extends PApplet {
     public void setup() {
         // TODO: initialize game variables
         tankTexture = loadImage("assets/TankTexture.png");
-        money = 0;
+        money = 10;
         towerCost = 10;
         tankReward = 5;
+        towersPlaced = 0;
         shields = 5;
         shieldCost = 50;
         shieldTax = 1;
@@ -71,6 +73,18 @@ public class Game extends PApplet {
         setup();
         Game.entities.clear();
     }
+    public static int getTowersPlaced() {
+        int count = 0;
+        for (int i = 0; i < entities.size(); i++) {
+            Entity e = entities.get(i);
+            if(e.typeName.equals("tower")) count++;
+        }
+        return count;
+    }
+
+    public static int getTowerCost() {
+        return towersPlaced*towersPlaced - towersPlaced + 10;
+    }
 
     public static boolean canPlaceTower(){
         boolean canPlace = true;
@@ -82,6 +96,12 @@ public class Game extends PApplet {
 
     public static void towerPlaced() {
         money -= towerCost;
+        towersPlaced = getTowersPlaced();
+        towerCost = getTowerCost();
+    }
+
+    public static void tankReachedEnd() {
+        shields--;
     }
 
     public void keyReleased(){
@@ -96,8 +116,8 @@ public class Game extends PApplet {
 
                 for (int i = 0; i < Game.entities.size(); i++) {
                     Entity e = Game.entities.get(i);
-
-                    out.println(e.getEntityType() + ", " + e.getX() + ", " + e.getY()  + ", " + e.getSpeed() + ", " + e.getRadius());
+                    String type = e.getEntityType();
+                    out.println(type + ", " + e.getX() + ", " + e.getY()  + ", " + e.getSpeed() + ", " + e.getRadius() + ", " + e.lives);
                 }
 
                 out.close();
@@ -109,6 +129,7 @@ public class Game extends PApplet {
                 out2.println("Tower Cost: " + towerCost);
                 out2.println("Shields: " + shields);
                 out2.println("Paused: " + paused);
+                out2.println("SpawnTimer: " + timer);
 
                 out2.close();
 
@@ -189,6 +210,7 @@ public class Game extends PApplet {
                 paused = true;
 
                 BufferedReader in = new BufferedReader(new FileReader("saveGame.txt"));
+                BufferedReader in2 = new BufferedReader(new FileReader("gameStats.txt"));
                 resetBoard();
 
                 int i = 0;
@@ -200,14 +222,15 @@ public class Game extends PApplet {
                     int y = Integer.parseInt(vals[2]);
                     double speed = Double.parseDouble(vals[3]);
                     int radius = Integer.parseInt(vals[4]);
+                    int lives = Integer.parseInt(vals[5]);
 
                     if (type.equals("tank")){
-                        Entity t = new Tank (x, y, speed, radius);
+                        Entity t = new Tank(x, y, lives);
                         Game.entities.add(t);
                     }
 
                     if (type.equals("tower")){
-                        Entity n = new Tower (x, y);
+                        Entity n = new Tower(x, y);
                         Game.entities.add(n);
                     }
 
@@ -218,6 +241,25 @@ public class Game extends PApplet {
                 }
 
                 in.close();
+
+                i = 0;
+                while ((line = in2.readLine()) != null) {
+                    String[] vals = line.split(": ");
+                    String type = vals[0];
+                    String val = vals[1];
+
+                    if(type.equals("Tanks Destroyed")) tanksDestroyed = Integer.parseInt(val);
+                    if(type.equals("Money")) money = Integer.parseInt(val);
+                    if(type.equals("Tank Reward")) tankReward = Integer.parseInt(val);
+                    //if(type.equals("Tower Cost")) towerCost = Integer.parseInt(val);
+                    if(type.equals("Shields")) shields = Integer.parseInt(val);
+                    //if(type.equals("Paused")) paused = Boolean.parseBoolean(val);
+                    if(type.equals("SpawnTimer")) timer = Integer.parseInt(val);
+                    i++;
+                }
+
+                towersPlaced = getTowersPlaced();
+                towerCost = getTowerCost();
 
 //                for (Entity e : entities) {
 //                    index++;
@@ -260,22 +302,26 @@ public class Game extends PApplet {
 
         PImage img = new PImage();
 
-        textSize(13);
+        textSize(16);
         fill(0);
         int x = 20;
-        text("Tanks Destroyed: " + tanksDestroyed, x, 20);
-        text("Money: $" + money, x, 40);
-        text("Tank Reward: $" + tankReward, x, 60);
-        text("Tower Cost: $" + towerCost, x, 80);
-        text("Shields: " + shields, x, 100);
-        text("Can Purchase Shield?: " + canPurchaseShields, x, 120);
-        text("Paused: " + paused, x, 160);
-        text("Entity List: " + entities.size(), x, 180);
+        fill(100, 0, 0);
+        text("Tanks Destroyed: " + tanksDestroyed, x, 790);
+        fill(0, 100, 0);
+        text("Tank Reward: $" + tankReward, x, 740);
+        fill(0, 0, 100);
+        text("Tower Cost: $" + towerCost, x, 710);
+        fill(0, 0, 0);
+//        text("Can Purchase Shield?: " + canPurchaseShields, x, 120);
+//        text("Paused: " + paused, x, 780);
+//        text("Entity List: " + entities.size(), x, 180);
 //        text("Timer: " + timer, x, 200);
-        text("Tank Frequency: " + maxTimer, x, 200);
-        text("Tank Spawned: " + tanksSpawned, x, 220);
+//        text("Tank Frequency: " + maxTimer, x, 200);
+//        text("Tank Spawned: " + tanksSpawned, x, 220);
 //        text("Last Timer Decrease: " + lastTimerDecreaseTankNum, x, 260);
-
+        textSize(20);
+        text("Money: $" + money, x, 40);
+        text("Shields: " + shields, x, 80);
 
         String pauseState;
         if (paused){
@@ -286,19 +332,20 @@ public class Game extends PApplet {
 
         if (!lost) {
             int x2 = 600;
+            textSize(13);
             text("'r' to reset", x2, 20);
             text("'p' to " + pauseState, x2, 40);
             text("'i' to by a shield for $" + shieldCost, x2, 60);
             text("'s' to save game", x2, 80);
-            //text("'l' to load", x2, 100);
+            text("'l' to load", x2, 100);
 
-            text("Developer Keys", x2 + 40, 120);
-            text("'d' to add $10 to money", x2, 140);
-            text("'c' to clear money", x2, 160);
-            text("'k' to loose a shield", x2, 180);
-            text("'j' to return to 5 shields", x2, 200);
-            text("'b' to make maxTimer = 20", x2, 220);
-            text("'a' to slow down tank frequency", x2, 240);
+//            text("Developer Keys", x2 + 40, 120);
+//            text("'d' to add $10 to money", x2, 140);
+//            text("'c' to clear money", x2, 160);
+//            text("'k' to loose a shield", x2, 180);
+//            text("'j' to return to 5 shields", x2, 200);
+//            text("'b' to make maxTimer = 20", x2, 220);
+//            text("'a' to slow down tank frequency", x2, 240);
 
         }
 
@@ -349,7 +396,7 @@ public class Game extends PApplet {
 
         if (timer <= 0) {
             timer = maxTimer;
-            Tank t = new Tank((int)((double)tanksDestroyed/10.0));
+            Tank t = new Tank((int)((double)tanksDestroyed/10.0) + 1);
             entities.add(t);
             tanksSpawned++;
         }

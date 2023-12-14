@@ -3,26 +3,28 @@ import processing.core.PImage;
 
 import java.util.ArrayList;
 
-public abstract class Entity {
+public class Entity {
     protected String typeName;
     protected int x, y;
     protected double speed;
     protected  int radius;
     protected boolean isAlive;
-    public Entity(String typeName, int x, int y, double speed, int radius) {
+    protected int lives;
+    public Entity(String typeName, int x, int y, double speed, int radius, int lives) {
         this.typeName = typeName;
         this.x = x;
         this.y = y;
         this.speed = speed;
         this.radius = radius;
         this.isAlive = true;
+        this.lives = lives;
     }
 
 
-    public abstract void drawTexture(PApplet pApplet);
+    public void drawTexture(PApplet pApplet) {}
 
-    public abstract void drawTexture(PApplet pApplet, PImage texture);
-    public abstract void act(ArrayList<Entity> list);
+    public void drawTexture(PApplet pApplet, PImage texture) {}
+    public void act() {}
 
     public int getX(){
         return x;
@@ -53,6 +55,6 @@ public abstract class Entity {
     }
 
     public String toString(){
-        return ("[" + typeName + ", " + x + ", " + y + "]");
+        return ("[" + typeName + ", " + x + ", " + y + ", l: "+lives+"]");
     }
 }
