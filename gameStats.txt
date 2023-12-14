@@ -1,6 +1,7 @@
-Tanks Destroyed: 24
-Money: 90
-Tank Reward: 9
-Tower Cost: 30
-Shields: 5
-Paused: true
+Tanks Destroyed: 53
+Money: 114
+Tank Reward: 25
+Tower Cost: 100
+Shields: 6
+Paused: false
+SpawnTimer: 48
